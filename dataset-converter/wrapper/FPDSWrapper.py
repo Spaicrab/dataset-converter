@@ -4,9 +4,7 @@ from ..data.LabelData import LabelData
 from ..wrapper.Wrapper import Wrapper
 from ..util.PathUtil import findByExtList
 
-
 class FPDSWrapper(Wrapper):
-
     def ext(self):
         return "txt"
 

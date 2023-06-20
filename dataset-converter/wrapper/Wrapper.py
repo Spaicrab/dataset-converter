@@ -2,7 +2,6 @@ from ..data.LabelData import LabelData
 
 
 class Wrapper:
-
     def __init__(self, data=None):
         self._path = None
         self._data = None

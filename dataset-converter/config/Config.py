@@ -1,7 +1,5 @@
 import argparse as Argparse
-
 from ..util.PathUtil import fixPath
-
 
 class Config:
     def __init__(self):

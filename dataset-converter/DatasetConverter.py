@@ -1,15 +1,8 @@
 import glob as Glob
+from .wrapper import *
+from .util.PathUtil import fixPath
 
-from ..wrapper.FPDSWrapper import FPDSWrapper
-from ..wrapper.LabelMeWrapper import LabelMeWrapper
-from ..wrapper.VOCWrapper import VOCWrapper
-from ..wrapper.YOLOWrapper import YOLOWrapper
-from ..wrapper.CocoWrapper import CocoWrapper
-from ..util.PathUtil import fixPath
-
-
-class DatasetConverterAPI:
-
+class DatasetConverter:
     def __init__(self):
         self.__wrappers = {
             'voc': VOCWrapper,

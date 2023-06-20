@@ -5,9 +5,7 @@ from ..data.LabelData import LabelData
 from ..wrapper.Wrapper import Wrapper
 from ..util.PathUtil import changeExt, findByExtList, extractExt
 
-
 class LabelMeWrapper(Wrapper):
-
     def ext(self):
         return "json"
 

@@ -1,8 +1,6 @@
-from ..data.BoundingBox import BoundingBox
-
+from .BoundingBox import BoundingBox
 
 class LabelData:
-
     def __init__(self, path, imageWidth, imageHeight):
         self.__path = path
         self.__imageWidth = int(imageWidth)
@@ -31,5 +29,3 @@ class LabelData:
         print(f"Objects: ")
         for obj in self.__objects:
             obj.print()
-
-

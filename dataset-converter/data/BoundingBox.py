@@ -1,5 +1,4 @@
 class BoundingBox:
-
     def __init__(self, name, minX, minY, maxX, maxY):
         self.__name = str(name)
         self.__minX = float(minX)
