@@ -46,25 +46,37 @@ class YOLOWrapper(Wrapper):
                 )
 
     def write(self, path):
+        # cpath = changeTargetFile(path, 'classes.txt')
+        # try:
+        #     with open(cpath) as f:
+        #         for line in f.readlines():
+        #             classes.append(line)
+        # except:
+        #     raise Exception("Missing classes.txt file")
         classes = []
-        cpath = changeTargetFile(path, 'classes.txt')
-        try:
-            with open(cpath) as f:
-                for line in f.readlines():
-                    classes.append(line)
-        except:
-            raise Exception("Missing classes.txt file")
         with open(changeExt(path, 'txt'), 'w') as f:
             for obj in self._data.objects():
-                objClass = None
-                for i in range(len(classes)):
-                    if obj.name() == classes[i].replace("\n", ""):
-                        objClass = i
-                        break
-                if objClass is None:
-                    raise Exception(f"Class not found for element with name: {obj.name()}")
+                # objClass = None
+                # for i in range(len(classes)):
+                #     if obj.name() == classes[i].replace("\n", ""):
+                #         objClass = i
+                #         break
+                # if objClass is None:
+                #     raise Exception(f"Class not found for element with name: {obj.name()}")
+                objClass = obj.name()
+                if not objClass in classes:
+                    classes.append(objClass)
+                    print("\n" + str(classes))
+                objName = classes.index(objClass)
                 width = obj.maxX() - obj.minX()
                 height = obj.maxY() - obj.minY()
                 center = [obj.maxX() - width / 2, obj.maxY() - height / 2]
                 f.write(
-                    f"{objClass} {center[0] / self._data.width()} {center[1] / self._data.height()} {width / self._data.width()} {height / self._data.height()}\n")
+                    f"{objName} {center[0] / self._data.width()} {center[1] / self._data.height()} {width / self._data.width()} {height / self._data.height()}\n")
+        classes_path = changeTargetFile(path, 'classes.txt')
+        with open(classes_path, "w") as f:
+            text = ""
+            for name in classes:
+                text += name + "\n"
+            text = text[:len(text)-1]
+            f.write(text)
