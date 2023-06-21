@@ -7,13 +7,11 @@ class DatasetConverter:
     def __init__(self):
         self.__wrappers = {
             'voc': VOCWrapper,
-            # 'labelme': LabelMeWrapper,
-            # 'fpds': FPDSWrapper,
             'yolo': YOLOWrapper,
             'coco': CocoWrapper
         }
 
-    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper):
+    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes = None):
         try:
             self.__wrappers[inputWrapper]
         except:
@@ -26,5 +24,8 @@ class DatasetConverter:
         ow = self.__wrappers[outputWrapper]()
         print("Parsing files...")
         data_list = iw.read_directory(sourcePath)
+        if classes != None:
+            for data in data_list:
+                data.filter_classes(classes)
         ow.write_directory(destinationPath, data_list)
         print("Done!")

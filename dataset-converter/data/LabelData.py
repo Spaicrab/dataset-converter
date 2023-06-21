@@ -7,6 +7,11 @@ class LabelData:
         self.__imageHeight = int(imageHeight)
         self.__objects = []
 
+    def filter_classes(self, classes):
+        for i, obj in enumerate(self.__objects):
+            if not obj.name() in classes:
+                self.__objects.pop(i)
+
     def addObject(self, name, minX, minY, maxX, maxY):
         self.__objects.append(BoundingBox(name, minX, minY, maxX, maxY))
 

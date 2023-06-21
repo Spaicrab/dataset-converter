@@ -167,7 +167,6 @@ class CocoWrapper(Wrapper):
         return "json"
 
     def read(self, label_path):
-        # super().read(label_path)
         label = open(label_path)
         label_data = json.load(label)
         data = LabelData(
