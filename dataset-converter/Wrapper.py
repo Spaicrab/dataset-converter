@@ -1,4 +1,5 @@
 import os, glob, imagesize
+import xml.etree.ElementTree as et
 
 from .data.LabelData import LabelData
 from .PathUtil import *
@@ -44,12 +45,12 @@ class YOLOWrapper(Wrapper):
                 for line in f.readlines():
                     classes.append(line.replace("\n", ""))
         except:
-            raise Exception("Missing classes.txt file")
+            raise Exception("Missing classes.txt file for YOLOWrapper")
         label_path = findByExtList(img_path, ['txt'])
         if label_path == None:
             return
         width, height = imagesize.get(img_path)
-        self._data = data = LabelData(
+        data = data = LabelData(
             img_path,
             width,
             height
@@ -105,3 +106,59 @@ class YOLOWrapper(Wrapper):
             text = text[:len(text)-1]
             f.write(text)
         return classes
+
+class VOCWrapper(Wrapper):
+    def ext(self):
+        return "xml"
+
+    def read(self, img_path):
+        label_path = findByExtList(img_path, ['xml'])
+        if label_path == None:
+            return
+        xml = et.parse(label_path).getroot()
+        data = LabelData(
+            xml.find("path").text,
+            xml.find("size").find("width").text,
+            xml.find("size").find("height").text,
+        )
+        for objj in xml.findall("object"):
+            obj = objj.find("bndbox")
+            data.addObject(
+                objj.find("name").text,
+                obj.find("xmin").text,
+                obj.find("ymin").text,
+                obj.find("xmax").text,
+                obj.find("ymax").text,
+            )
+        return data
+
+    def write(self, path, data):
+        xml = et.Element('annotation')
+        split_path = path.split("/")
+        self.__xmlAdd(xml, "folder", path.split("/")[len(split_path) - 2])
+        filename = split_path[-1].split(".")
+        filename = filename[len(filename) - 2]
+        self.__xmlAdd(xml, 'filename', f"{filename}.jpg")
+        self.__xmlAdd(xml, 'path', path.replace(split_path[-1], f"{filename}.jpg"))
+        size = et.SubElement(xml, 'size')
+        self.__xmlAdd(size, 'width', data.width())
+        self.__xmlAdd(size, 'height', data.height())
+        self.__xmlAdd(size, 'depth', 3)
+        self.__xmlAdd(xml, 'segmented', 0)
+        for obj in data.objects():
+            xmlObj = et.SubElement(xml, 'object')
+            self.__xmlAdd(xmlObj, 'name', obj.name())
+            self.__xmlAdd(xmlObj, 'pose', 'Unspecified')
+            self.__xmlAdd(xmlObj, 'truncated', 0)
+            self.__xmlAdd(xmlObj, 'difficult', 0)
+            box = et.SubElement(xmlObj, 'bndbox')
+            self.__xmlAdd(box, 'xmin', int(obj.minX()))
+            self.__xmlAdd(box, 'ymin', int(obj.minY()))
+            self.__xmlAdd(box, 'xmax', int(obj.maxX()))
+            self.__xmlAdd(box, 'ymax', int(obj.maxY()))
+        with open(path.replace(split_path[-1], f"{filename}.xml"), "wb") as f:
+            f.write(et.tostring(xml))
+
+    def __xmlAdd(self, xml, key, value):
+        el = et.SubElement(xml, key)
+        el.text = str(value)
