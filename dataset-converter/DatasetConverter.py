@@ -10,7 +10,7 @@ class DatasetConverter:
             # 'labelme': LabelMeWrapper,
             # 'fpds': FPDSWrapper,
             'yolo': YOLOWrapper,
-            # 'coco': CocoWrapper
+            'coco': CocoWrapper
         }
 
     def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper):

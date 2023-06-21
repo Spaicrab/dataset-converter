@@ -1,17 +1,22 @@
 import os, glob, imagesize
 import xml.etree.ElementTree as et
+import datetime, json
 
 from .data.LabelData import LabelData
 from .PathUtil import *
 
 class Wrapper:
+    def ext(self):
+        return None
+    
     def read_directory(self, dir_path):
         data_list = []
         dir_path = fixPath(dir_path)
-        for img_path in glob.iglob(dir_path + "/*.[jp][pn]g"):
-            img_path = fixPath(img_path)
-            data = self.read(img_path)
-            data_list.append(data)
+        for label_path in glob.iglob(dir_path + "/*." + self.ext()):
+            label_path = fixPath(label_path)
+            data = self.read(label_path)
+            if data != None:
+                data_list.append(data)
         return data_list
 
     def read(self, path):
@@ -30,25 +35,22 @@ class Wrapper:
     def write(self, path, data):
         pass
 
-    def ext(self):
-        return None
-
 class YOLOWrapper(Wrapper):
     def ext(self):
         return "txt"
 
-    def read(self, img_path):
+    def read(self, label_path):
         classes = []
         try:
-            cpath = changeTargetFile(img_path, 'classes.txt')
+            cpath = changeTargetFile(label_path, 'classes.txt')
             with open(cpath) as f:
                 for line in f.readlines():
                     classes.append(line.replace("\n", ""))
         except:
             raise Exception("Missing classes.txt file for YOLOWrapper")
-        label_path = findByExtList(img_path, ['txt'])
-        if label_path == None:
-            return
+        img_path = findByExtList(label_path, ['jpg', 'png'])
+        if img_path == None:
+            return None
         width, height = imagesize.get(img_path)
         data = data = LabelData(
             img_path,
@@ -111,10 +113,7 @@ class VOCWrapper(Wrapper):
     def ext(self):
         return "xml"
 
-    def read(self, img_path):
-        label_path = findByExtList(img_path, ['xml'])
-        if label_path == None:
-            return
+    def read(self, label_path):
         xml = et.parse(label_path).getroot()
         data = LabelData(
             xml.find("path").text,
@@ -162,3 +161,82 @@ class VOCWrapper(Wrapper):
     def __xmlAdd(self, xml, key, value):
         el = et.SubElement(xml, key)
         el.text = str(value)
+    
+class CocoWrapper(Wrapper):
+    def ext(self):
+        return "json"
+
+    def read(self, label_path):
+        # super().read(label_path)
+        label = open(label_path)
+        label_data = json.load(label)
+        data = LabelData(
+            label_path,
+            label_data['images'][0]['width'],
+            label_data['images'][0]['height']
+        )
+        for obj in label_data['annotations']:
+            data.addObject(label_data['categories'][obj['category_id']]['name'], obj['bbox'][0], obj['bbox'][1], obj['bbox'][2], obj['bbox'][3])
+        return data
+
+    def write(self, path, data):
+        imgPath = data.path()
+        imgPath = findByExtList(imgPath, ['jpg', 'png'])
+        info = {
+            'description': 'Dataset converted with DatasetConverter',
+            'url': '',
+            'version': '1.0',
+            'year': int(datetime.datetime.now().year),
+            'contributor': 'DatasetConverter',
+            'date_created': f'{datetime.datetime.now().year}/{datetime.datetime.now().month}/{datetime.datetime.now().day}'
+        }
+        licenses = []
+        images = [
+            {
+                'file_name': imgPath.split("/")[-1],
+                'height': data.height(),
+                'width': data.width(),
+                'id': 1
+            }
+        ]
+        annotations = []
+        categories = []
+        idx = 0
+        for obj in data.objects():
+            cat = None
+            for i in range(len(categories)):
+                if categories[i]['name'].replace("\n", "") == obj.name().replace("\n",""):
+                    cat = i
+                    break
+            if cat is None:
+                categories.append({
+                    'supercategory': obj.name(),
+                    'id': len(categories),
+                    'name': obj.name()
+                })
+                cat = len(categories)-1
+            annotations.append({
+                'segmentation': [],
+                'area': (obj.maxX()-obj.minX())*(obj.maxY()-obj.minY()),
+                'iscrowd': 0,
+                'image_id': 1,
+                'bbox': [
+                    obj.minX(),
+                    obj.minY(),
+                    obj.maxX(),
+                    obj.maxY()
+                ],
+                'category_id': cat,
+                'id': idx
+            })
+            idx += 1
+        data_to_write = {
+            'info': info,
+            'licenses': licenses,
+            'images': images,
+            'annotations': annotations,
+            'categories': categories
+
+        }
+        f = open(changeExt(path, "json"), 'w')
+        f.write(json.dumps(data_to_write, sort_keys=True, indent=4))
