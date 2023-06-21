@@ -12,7 +12,7 @@ class DatasetConverter:
             'coco': CocoWrapper
         }
 
-    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes = None):
+    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes=None, recursive=True):
         try:
             self.__wrappers[inputWrapper]
         except:
@@ -26,7 +26,7 @@ class DatasetConverter:
         ow = self.__wrappers[outputWrapper]()
 
         print("Parsing files...")
-        data_list = iw.read_directory(sourcePath)
+        data_list = iw.read_directory(sourcePath, recursive)
         total_files = len(data_list)
 
         if classes != None:

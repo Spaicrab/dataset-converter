@@ -9,10 +9,16 @@ class Wrapper:
     def ext(self):
         return None
     
-    def read_directory(self, dir_path):
+    def read_directory(self, dir_path, recursive=False):
+        
         data_list = []
         dir_path = fixPath(dir_path)
-        for label_path in glob.iglob(dir_path + "/*." + self.ext()):
+        file_condition = dir_path
+        if recursive:
+            file_condition += '/**/*.' + self.ext()
+        else:
+            file_condition += '/*.' + self.ext()
+        for label_path in glob.iglob(file_condition, recursive=recursive):
             label_path = fixPath(label_path)
             data = self.read(label_path)
             if data != None:
