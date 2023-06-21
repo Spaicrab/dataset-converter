@@ -19,17 +19,15 @@ class Wrapper:
             file_condition += '/*.' + self.ext()
         for label_path in glob.iglob(file_condition, recursive=recursive):
             label_path = fixPath(label_path)
-            imgPath = findByExtList(label_path, ['jpg', 'png'])
-            if imgPath != None:
-                data = self.read(label_path)
-                if data != None:
-                    data_list.append(data)
+            data = self.read(label_path)
+            if data != None:
+                data_list.append(data)
         return data_list
 
     def read(self, path):
         return None
 
-    def write_directory(self, dir_path, data_list):
+    def write_directory(self, dir_path, data_list, copy=True):
         dir_path = fixPath(dir_path)
         os.makedirs(dir_path, exist_ok=True)
         to_parse = len(data_list)
@@ -37,7 +35,10 @@ class Wrapper:
         for data in data_list:
             img_name = os.path.basename(data.path())
             path = dir_path + "/" + img_name
-            self.write_with_image(path, data)
+            if copy:
+                self.write_with_image(path, data)
+            else:
+                self.write(path, data)
 
     def write_with_image(self, path, data):
         imgPath = data.path()
@@ -92,7 +93,7 @@ class YOLOWrapper(Wrapper):
                 )
         return data
 
-    def write_directory(self, dir_path, data_list):
+    def write_directory(self, dir_path, data_list, copy=True):
         dir_path = fixPath(dir_path)
         os.makedirs(dir_path, exist_ok=True)
         to_parse = len(data_list)
@@ -101,7 +102,10 @@ class YOLOWrapper(Wrapper):
         for data in data_list:
             img_name = os.path.basename(data.path())
             path = dir_path + "/" + img_name
-            classes = self.write_with_image(path, data, classes)
+            if copy:
+                classes = self.write_with_image(path, data, classes)
+            else:
+                classes = self.write(path, data, classes)
 
     def write_with_image(self, path, data, classes):
         imgPath = data.path()

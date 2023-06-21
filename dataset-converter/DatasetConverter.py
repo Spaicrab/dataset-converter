@@ -12,7 +12,7 @@ class DatasetConverter:
             'coco': CocoWrapper
         }
 
-    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes=None, recursive=True):
+    def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes=None, copy=True, recursive=True):
         try:
             self.__wrappers[inputWrapper]
         except:
@@ -42,5 +42,5 @@ class DatasetConverter:
         else:
             text = f"Converted {total_files} files."
         
-        ow.write_directory(destinationPath, data_list)
+        ow.write_directory(destinationPath, data_list, copy)
         print(text)
