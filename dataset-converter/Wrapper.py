@@ -21,16 +21,10 @@ class Wrapper:
             label_path = fixPath(label_path)
             imgPath = findByExtList(label_path, ['jpg', 'png'])
             if imgPath != None:
-                data = self.read_with_image(label_path)
+                data = self.read(label_path)
                 if data != None:
                     data_list.append(data)
         return data_list
-
-    def read_with_image(self, path):
-        imgPath = findByExtList(path, ['jpg', 'png'])
-        if imgPath == None:
-            raise Exception(f"Missing image file. - {imgPath}")
-        return self.read(path)
 
     def read(self, path):
         return None
