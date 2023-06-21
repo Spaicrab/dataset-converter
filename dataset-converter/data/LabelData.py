@@ -8,9 +8,12 @@ class LabelData:
         self.__objects = []
 
     def filter_classes(self, classes):
-        for i, obj in enumerate(self.__objects):
+        remove_list = []
+        for i, obj in enumerate(self.objects(), start=0):
             if not obj.name() in classes:
-                self.__objects.pop(i)
+                remove_list.insert(0, i)
+        for i in remove_list:
+            self.__objects.pop(i)
 
     def addObject(self, name, minX, minY, maxX, maxY):
         self.__objects.append(BoundingBox(name, minX, minY, maxX, maxY))
