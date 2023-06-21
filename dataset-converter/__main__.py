@@ -17,9 +17,10 @@ def main():
         type=str,
         required=False,
         nargs='+',
-        help="list of classes to be converted, all the other classes' bounding boxes will be ignored - default: filter disabled")
-    parser.add_argument('--disable-copy', '-d', action='store_true', help='don\'t copy images to OUTPUT_PATH - default: copy enabled')
+        help="list of classes to be filtered: all labels that don't contain at least one of them are ignored - default: filter disabled")
+    parser.add_argument('--disable-copy', '-d', action='store_true', help="don't copy images to OUTPUT_PATH - default: copy enabled")
     args = parser.parse_args()
+    
     in_dir = fixPath(args.INPUT_PATH)
     out_dir = fixPath(args.OUTPUT_PATH)
     in_wrap = args.INPUT_WRAPPER

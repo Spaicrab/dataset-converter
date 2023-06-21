@@ -8,12 +8,12 @@ class LabelData:
         self.__objects = []
 
     def filter_classes(self, classes):
-        remove_list = []
-        for i, obj in enumerate(self.objects(), start=0):
-            if not obj.name() in classes:
-                remove_list.insert(0, i)
-        for i in remove_list:
-            self.__objects.pop(i)
+        contains_accepted_class = False
+        for obj in self.objects():
+            if obj.name() in classes:
+                contains_accepted_class = True
+                break
+        return contains_accepted_class
 
     def addObject(self, name, minX, minY, maxX, maxY):
         self.__objects.append(BoundingBox(name, minX, minY, maxX, maxY))

@@ -32,8 +32,8 @@ class DatasetConverter:
         if classes != None:
             remove_list = []
             for i, data in enumerate(data_list, start=0):
-                data.filter_classes(classes)
-                if len(data.objects()) == 0:
+                valid = data.filter_classes(classes)
+                if not valid:
                     remove_list.insert(0, i)
             for i in remove_list:
                 data_list.pop(i)
