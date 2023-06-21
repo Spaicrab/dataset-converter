@@ -74,8 +74,18 @@ class YOLOWrapper(Wrapper):
                 )
         return data
 
-    def write(self, path, data):
+    def write_directory(self, dir_path, data_list):
+        dir_path = fixPath(dir_path)
+        os.makedirs(dir_path, exist_ok=True)
+        to_parse = len(data_list)
+        parsed = 0
         classes = []
+        for data in data_list:
+            img_name = os.path.basename(data.path())
+            path = dir_path + "/" + img_name
+            classes = self.write(path, data, classes)
+
+    def write(self, path, data, classes):
         with open(changeExt(path, 'txt'), 'w') as f:
             for obj in data.objects():
                 objClass = obj.name()
@@ -94,3 +104,4 @@ class YOLOWrapper(Wrapper):
                 text += name + "\n"
             text = text[:len(text)-1]
             f.write(text)
+        return classes
