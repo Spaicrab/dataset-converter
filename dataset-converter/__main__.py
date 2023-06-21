@@ -1,5 +1,6 @@
 import argparse
 from .DatasetConverter import DatasetConverter
+from .util.PathUtil import fixPath
 
 def main():
     parser = argparse.ArgumentParser()

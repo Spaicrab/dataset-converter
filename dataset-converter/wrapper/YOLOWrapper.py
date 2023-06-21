@@ -1,9 +1,7 @@
-import imagesize as ImageSize
-
+import imagesize
 from ..data.LabelData import LabelData
 from ..wrapper.Wrapper import Wrapper
 from ..util.PathUtil import findByExtList, changeTargetFile, changeExt
-
 
 class YOLOWrapper(Wrapper):
 
@@ -19,7 +17,10 @@ class YOLOWrapper(Wrapper):
                     classes.append(line.replace("\n", ""))
         except:
             raise Exception("Missing classes.txt file")
-        width, height = ImageSize.get(findByExtList(path, ['jpg', 'png']))
+        img_path = findByExtList(path, ['jpg', 'png'])
+        if img_path == None:
+            return
+        width, height = imagesize.get(img_path)
         self._data = data = LabelData(
             path,
             width,
@@ -29,13 +30,13 @@ class YOLOWrapper(Wrapper):
             lines = f.readlines()
             for line in lines:
                 args = line.split(" ")
-                args[1] = int(args[1]) * width
-                args[3] = int(args[3]) * width
-                args[2] = int(args[2]) * height
-                args[4] = int(args[4]) * height
+                args[1] = float(args[1]) * width
+                args[3] = float(args[3]) * width
+                args[2] = float(args[2]) * height
+                args[4] = float(args[4]) * height
 
-                pmin = [int(args[1]) - int(args[3]) / 2, int(args[2]) - int(args[4]) / 2]
-                pmax = [int(args[1]) + int(args[3]) / 2, int(args[2]) + int(args[4]) / 2]
+                pmin = [float(args[1]) - float(args[3]) / 2, float(args[2]) - float(args[4]) / 2]
+                pmax = [float(args[1]) + float(args[3]) / 2, float(args[2]) + float(args[4]) / 2]
                 data.addObject(
                     classes[int(args[0])],
                     pmin[0],

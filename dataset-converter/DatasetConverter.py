@@ -1,5 +1,9 @@
-import glob
-from .wrapper import *
+import glob, os
+from .wrapper.VOCWrapper import VOCWrapper
+from .wrapper.LabelMeWrapper import LabelMeWrapper
+from .wrapper.FPDSWrapper import FPDSWrapper
+from .wrapper.YOLOWrapper import YOLOWrapper
+from .wrapper.CocoWrapper import CocoWrapper
 from .util.PathUtil import fixPath
 
 class DatasetConverter:
@@ -27,13 +31,15 @@ class DatasetConverter:
         parsed = 0
         print(f"[DatasetConverter] Parsing files: {parsed}/{toParse}", end="")
 
+        os.makedirs(destinationPath, exist_ok=True )
         for file in files:
             parsed += 1
             print(f"\r[DatasetConverter] Parsing files: {parsed}/{toParse}", end="")
             iw = self.__wrappers[inputWrapper]()
+            file = fixPath(file)
             iw.read(file)
 
-            ow = self.__wrappers[outputWrapper](iw.data())
-            file = fixPath(file)
-            ow.write(f'{destinationPath}/{file.split("/")[-1]}')
+            if iw.data() != None:
+                ow = self.__wrappers[outputWrapper](iw.data())
+                ow.write(f'{destinationPath}/{file.split("/")[-1]}')
         print("\n[DatasetConverter] Done!")
