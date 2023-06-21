@@ -1,41 +1,33 @@
-import imagesize, glob
+import os, glob, imagesize
 
 from .data.LabelData import LabelData
 from .PathUtil import *
 
 class Wrapper:
-    def __init__(self, data=None):
-        self._path = None
-        self._data = None
-        if data is None or data is not LabelData:
-            pass
-        self._data = data
-
     def read_directory(self, dir_path):
         data_list = []
         dir_path = fixPath(dir_path)
-        images = glob.glob(dir_path + "/*.[jp][pn]g")
-        to_parse = len(images)
-        parsed = 0
-        for img_path in images:
+        for img_path in glob.iglob(dir_path + "/*.[jp][pn]g"):
             img_path = fixPath(img_path)
-            parsed += 1
-            print(f"\r[DatasetConverter] Parsing files: {parsed}/{to_parse}", end="")
             data = self.read(img_path)
             data_list.append(data)
         return data_list
 
     def read(self, path):
-        self._path = path
+        return None
 
-    def write_directory(self, dir_path):
+    def write_directory(self, dir_path, data_list):
+        dir_path = fixPath(dir_path)
+        os.makedirs(dir_path, exist_ok=True)
+        to_parse = len(data_list)
+        parsed = 0
+        for data in data_list:
+            img_name = os.path.basename(data.path())
+            path = dir_path + "/" + img_name
+            self.write(path, data)
+
+    def write(self, path, data):
         pass
-
-    def write(self, path):
-        self._path = path
-
-    def data(self):
-        return self._data
 
     def ext(self):
         return None
@@ -82,34 +74,19 @@ class YOLOWrapper(Wrapper):
                 )
         return data
 
-    def write(self, path):
-        # cpath = changeTargetFile(path, 'classes.txt')
-        # try:
-        #     with open(cpath) as f:
-        #         for line in f.readlines():
-        #             classes.append(line)
-        # except:
-        #     raise Exception("Missing classes.txt file")
+    def write(self, path, data):
         classes = []
         with open(changeExt(path, 'txt'), 'w') as f:
-            for obj in self._data.objects():
-                # objClass = None
-                # for i in range(len(classes)):
-                #     if obj.name() == classes[i].replace("\n", ""):
-                #         objClass = i
-                #         break
-                # if objClass is None:
-                #     raise Exception(f"Class not found for element with name: {obj.name()}")
+            for obj in data.objects():
                 objClass = obj.name()
                 if not objClass in classes:
                     classes.append(objClass)
-                    print("\n" + str(classes))
                 objName = classes.index(objClass)
                 width = obj.maxX() - obj.minX()
                 height = obj.maxY() - obj.minY()
                 center = [obj.maxX() - width / 2, obj.maxY() - height / 2]
                 f.write(
-                    f"{objName} {center[0] / self._data.width()} {center[1] / self._data.height()} {width / self._data.width()} {height / self._data.height()}\n")
+                    f"{objName} {center[0] / data.width()} {center[1] / data.height()} {width / data.width()} {height / data.height()}\n")
         classes_path = changeTargetFile(path, 'classes.txt')
         with open(classes_path, "w") as f:
             text = ""

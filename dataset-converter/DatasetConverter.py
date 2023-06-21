@@ -56,9 +56,8 @@ class DatasetConverter:
         except:
             raise Exception(f'No wrappers found with name {outputWrapper}')
         iw = self.__wrappers[inputWrapper]()
+        ow = self.__wrappers[outputWrapper]()
+        print("Parsing files...")
         data_list = iw.read_directory(sourcePath)
-        print()
-        data = data_list[0]
-        data.show()
-        # for obj in iw._data.objects():
-        #     print(obj)
+        ow.write_directory(destinationPath, data_list)
+        print("Done!")
