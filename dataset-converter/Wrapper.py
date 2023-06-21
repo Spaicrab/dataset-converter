@@ -1,32 +1,68 @@
-import imagesize
-from ..data.LabelData import LabelData
-# from ..wrapper.Wrapper import Wrapper
-from ..PathUtil import findByExtList, changeTargetFile, changeExt
+import imagesize, glob
 
-class YOLOWrapper():
+from .data.LabelData import LabelData
+from .PathUtil import *
 
+class Wrapper:
+    def __init__(self, data=None):
+        self._path = None
+        self._data = None
+        if data is None or data is not LabelData:
+            pass
+        self._data = data
+
+    def read_directory(self, dir_path):
+        data_list = []
+        dir_path = fixPath(dir_path)
+        images = glob.glob(dir_path + "/*.[jp][pn]g")
+        to_parse = len(images)
+        parsed = 0
+        for img_path in images:
+            img_path = fixPath(img_path)
+            parsed += 1
+            print(f"\r[DatasetConverter] Parsing files: {parsed}/{to_parse}", end="")
+            data = self.read(img_path)
+            data_list.append(data)
+        return data_list
+
+    def read(self, path):
+        self._path = path
+
+    def write_directory(self, dir_path):
+        pass
+
+    def write(self, path):
+        self._path = path
+
+    def data(self):
+        return self._data
+
+    def ext(self):
+        return None
+
+class YOLOWrapper(Wrapper):
     def ext(self):
         return "txt"
 
-    def read(self, path):
+    def read(self, img_path):
         classes = []
         try:
-            cpath = changeTargetFile(path, 'classes.txt')
+            cpath = changeTargetFile(img_path, 'classes.txt')
             with open(cpath) as f:
                 for line in f.readlines():
                     classes.append(line.replace("\n", ""))
         except:
             raise Exception("Missing classes.txt file")
-        img_path = findByExtList(path, ['jpg', 'png'])
-        if img_path == None:
+        label_path = findByExtList(img_path, ['txt'])
+        if label_path == None:
             return
         width, height = imagesize.get(img_path)
         self._data = data = LabelData(
-            path,
+            img_path,
             width,
             height
         )
-        with open(path) as f:
+        with open(label_path) as f:
             lines = f.readlines()
             for line in lines:
                 args = line.split(" ")
@@ -44,6 +80,7 @@ class YOLOWrapper():
                     pmax[0],
                     pmax[1]
                 )
+        return data
 
     def write(self, path):
         # cpath = changeTargetFile(path, 'classes.txt')

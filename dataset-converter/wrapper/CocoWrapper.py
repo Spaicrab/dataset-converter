@@ -2,10 +2,10 @@ import datetime
 import json
 
 from ..data.LabelData import LabelData
-from ..wrapper.Wrapper import Wrapper
-from ..util.PathUtil import changeExt, findByExtList, extractExt
+# from ..wrapper.Wrapper import Wrapper
+from ..PathUtil import changeExt, findByExtList, extractExt
 
-class CocoWrapper(Wrapper):
+class CocoWrapper():
     def ext(self):
         return "json"
 

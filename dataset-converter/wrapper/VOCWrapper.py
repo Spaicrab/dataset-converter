@@ -1,9 +1,9 @@
 import xml.etree.ElementTree as ET
 
 from ..data.LabelData import LabelData
-from ..wrapper.Wrapper import Wrapper
+# from ..wrapper.Wrapper import Wrapper
 
-class VOCWrapper(Wrapper):
+class VOCWrapper():
     def ext(self):
         return "xml"
 

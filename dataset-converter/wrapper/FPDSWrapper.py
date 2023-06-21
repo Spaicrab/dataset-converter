@@ -1,10 +1,10 @@
 import imagesize as ImageSize
 
 from ..data.LabelData import LabelData
-from ..wrapper.Wrapper import Wrapper
-from ..util.PathUtil import findByExtList
+# from ..wrapper.Wrapper import Wrapper
+from ..PathUtil import findByExtList
 
-class FPDSWrapper(Wrapper):
+class FPDSWrapper():
     def ext(self):
         return "txt"
 

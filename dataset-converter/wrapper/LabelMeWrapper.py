@@ -2,10 +2,10 @@ import base64 as Base64
 import json
 
 from ..data.LabelData import LabelData
-from ..wrapper.Wrapper import Wrapper
-from ..util.PathUtil import changeExt, findByExtList, extractExt
+# from ..wrapper.Wrapper import Wrapper
+from ..PathUtil import changeExt, findByExtList, extractExt
 
-class LabelMeWrapper(Wrapper):
+class LabelMeWrapper():
     def ext(self):
         return "json"
 
