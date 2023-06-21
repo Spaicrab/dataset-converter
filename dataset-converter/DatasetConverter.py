@@ -1,4 +1,4 @@
-import glob as Glob
+import glob
 from .wrapper import *
 from .util.PathUtil import fixPath
 
@@ -21,7 +21,7 @@ class DatasetConverter:
             self.__wrappers[outputWrapper]
         except:
             raise Exception(f'No wrappers found with name {outputWrapper}')
-        files = Glob.glob(f"{sourcePath}/*.{self.__wrappers[inputWrapper]().ext()}", recursive=True)
+        files = glob.glob(f"{sourcePath}/*.{self.__wrappers[inputWrapper]().ext()}", recursive=True)
 
         toParse = len(files)
         parsed = 0

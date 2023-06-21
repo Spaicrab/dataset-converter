@@ -1,9 +1,9 @@
-import argparse as Argparse
+import argparse
 from ..util.PathUtil import fixPath
 
 class Config:
     def __init__(self):
-        parser = Argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
         parser.add_argument('--sdir', type=str, required=True)
         parser.add_argument('--ddir', type=str, required=True)
         parser.add_argument('--iw', type=str, required=True)
