@@ -18,7 +18,7 @@ def main():
         required=False,
         nargs='+',
         help="list of classes to be filtered: all labels that don't contain at least one of them are ignored - default: filter disabled")
-    parser.add_argument('--disable-copy', '-d', action='store_true', help="don't copy images to OUTPUT_PATH - default: copy enabled")
+    parser.add_argument('--no-img', '-n', action='store_true', help="don't copy images to OUTPUT_PATH - default: copy enabled")
     args = parser.parse_args()
     
     in_dir = fixPath(args.INPUT_PATH)
@@ -26,7 +26,7 @@ def main():
     in_wrap = args.INPUT_WRAPPER
     out_wrap = args.OUTPUT_WRAPPER
     classes = args.filter_classes
-    copy = not args.disable_copy
+    copy = not args.no_img
     converter = DatasetConverter()
     converter.convert(
         in_dir, out_dir, in_wrap, out_wrap, classes, copy
