@@ -30,8 +30,6 @@ converter.convert(
     in_dir, out_dir, in_wrap, out_wrap, [classes], [copy], [recursive]
 )
 ```
-where:
-
 **in_dir** and **out_dir** are both directory paths
 
 **in_wrap** and **out_wrap** are both strings
