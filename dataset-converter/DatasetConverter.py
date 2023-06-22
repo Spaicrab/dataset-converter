@@ -6,24 +6,23 @@ from .data.LabelData import LabelData
 
 class DatasetConverter:
     def __init__(self):
-        self.__wrappers = {
+        self.wrappers = {
             'voc': VOCWrapper,
             'yolo': YOLOWrapper,
             'coco': CocoWrapper
         }
 
     def convert(self, sourcePath, destinationPath, inputWrapper, outputWrapper, classes=None, copy=True, recursive=True):
+        inputWrapper = inputWrapper.lower()
         try:
-            self.__wrappers[inputWrapper]
+            iw = self.wrappers[inputWrapper]()
         except:
             raise Exception(f'No wrappers found with name {inputWrapper}')
+        outputWrapper = outputWrapper.lower()
         try:
-            self.__wrappers[outputWrapper]
+            ow = self.wrappers[outputWrapper]()
         except:
             raise Exception(f'No wrappers found with name {outputWrapper}')
-
-        iw = self.__wrappers[inputWrapper]()
-        ow = self.__wrappers[outputWrapper]()
 
         print("Parsing files...")
         data_list = iw.read_directory(sourcePath, recursive)

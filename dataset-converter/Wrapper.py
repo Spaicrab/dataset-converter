@@ -33,7 +33,7 @@ class Wrapper:
         to_parse = len(data_list)
         parsed = 0
         for data in data_list:
-            img_name = os.path.basename(data.path())
+            img_name = os.path.basename(data.path)
             path = dir_path + "/" + img_name
             if copy:
                 self.write_with_image(path, data)
@@ -41,11 +41,14 @@ class Wrapper:
                 self.write(path, data)
 
     def write_with_image(self, path, data):
-        imgPath = data.path()
+        imgPath = data.path
         imgPath = findByExtList(imgPath, ['jpg', 'png'])
         if imgPath == None:
             raise Exception(f"Missing image file. - {imgPath}")
-        shutil.copy(imgPath, os.path.dirname(path))
+        try:
+            shutil.copy(imgPath, os.path.dirname(path))
+        except shutil.SameFileError:
+            pass
         self.write(path, data)
 
     def write(self, path, data):
@@ -100,7 +103,7 @@ class YOLOWrapper(Wrapper):
         parsed = 0
         classes = []
         for data in data_list:
-            img_name = os.path.basename(data.path())
+            img_name = os.path.basename(data.path)
             path = dir_path + "/" + img_name
             if copy:
                 classes = self.write_with_image(path, data, classes)
@@ -108,25 +111,28 @@ class YOLOWrapper(Wrapper):
                 classes = self.write(path, data, classes)
 
     def write_with_image(self, path, data, classes):
-        imgPath = data.path()
+        imgPath = data.path
         imgPath = findByExtList(imgPath, ['jpg', 'png'])
         if imgPath == None:
             raise Exception(f"Missing image file. - {imgPath}")
-        shutil.copy(imgPath, os.path.dirname(path))
+        try:
+            shutil.copy(imgPath, os.path.dirname(path))
+        except shutil.SameFileError:
+            pass
         return self.write(path, data, classes)
 
     def write(self, path, data, classes):
         with open(changeExt(path, 'txt'), 'w') as f:
-            for obj in data.objects():
-                objClass = obj.name()
+            for obj in data.objects:
+                objClass = obj.name
                 if not objClass in classes:
                     classes.append(objClass)
                 objName = classes.index(objClass)
-                width = obj.maxX() - obj.minX()
-                height = obj.maxY() - obj.minY()
-                center = [obj.maxX() - width / 2, obj.maxY() - height / 2]
+                width = obj.maxX - obj.minX
+                height = obj.maxY - obj.minY
+                center = [obj.maxX - width / 2, obj.maxY - height / 2]
                 f.write(
-                    f"{objName} {center[0] / data.width()} {center[1] / data.height()} {width / data.width()} {height / data.height()}\n")
+                    f"{objName} {center[0] / data.width} {center[1] / data.height} {width / data.width} {height / data.height}\n")
         classes_path = changeTargetFile(path, 'classes.txt')
         with open(classes_path, "w") as f:
             text = ""
@@ -167,21 +173,21 @@ class VOCWrapper(Wrapper):
         self.__xmlAdd(xml, 'filename', f"{filename}.jpg")
         self.__xmlAdd(xml, 'path', path.replace(split_path[-1], f"{filename}.jpg"))
         size = et.SubElement(xml, 'size')
-        self.__xmlAdd(size, 'width', data.width())
-        self.__xmlAdd(size, 'height', data.height())
+        self.__xmlAdd(size, 'width', data.width)
+        self.__xmlAdd(size, 'height', data.height)
         self.__xmlAdd(size, 'depth', 3)
         self.__xmlAdd(xml, 'segmented', 0)
-        for obj in data.objects():
+        for obj in data.objects:
             xmlObj = et.SubElement(xml, 'object')
-            self.__xmlAdd(xmlObj, 'name', obj.name())
+            self.__xmlAdd(xmlObj, 'name', obj.name)
             self.__xmlAdd(xmlObj, 'pose', 'Unspecified')
             self.__xmlAdd(xmlObj, 'truncated', 0)
             self.__xmlAdd(xmlObj, 'difficult', 0)
             box = et.SubElement(xmlObj, 'bndbox')
-            self.__xmlAdd(box, 'xmin', int(obj.minX()))
-            self.__xmlAdd(box, 'ymin', int(obj.minY()))
-            self.__xmlAdd(box, 'xmax', int(obj.maxX()))
-            self.__xmlAdd(box, 'ymax', int(obj.maxY()))
+            self.__xmlAdd(box, 'xmin', int(obj.minX))
+            self.__xmlAdd(box, 'ymin', int(obj.minY))
+            self.__xmlAdd(box, 'xmax', int(obj.maxX))
+            self.__xmlAdd(box, 'ymax', int(obj.maxY))
         with open(path.replace(split_path[-1], f"{filename}.xml"), "wb") as f:
             f.write(et.tostring(xml))
 
@@ -206,7 +212,7 @@ class CocoWrapper(Wrapper):
         return data
 
     def write(self, path, data):
-        imgPath = data.path()
+        imgPath = data.path
         imgPath = findByExtList(imgPath, ['jpg', 'png'])
         info = {
             'description': 'Dataset converted with DatasetConverter',
@@ -220,15 +226,15 @@ class CocoWrapper(Wrapper):
         images = [
             {
                 'file_name': imgPath.split("/")[-1],
-                'height': data.height(),
-                'width': data.width(),
+                'height': data.height,
+                'width': data.width,
                 'id': 1
             }
         ]
         annotations = []
         categories = []
         idx = 0
-        for obj in data.objects():
+        for obj in data.objects:
             cat = None
             for i in range(len(categories)):
                 if categories[i]['name'].replace("\n", "") == obj.name().replace("\n",""):
@@ -236,21 +242,21 @@ class CocoWrapper(Wrapper):
                     break
             if cat is None:
                 categories.append({
-                    'supercategory': obj.name(),
+                    'supercategory': obj.name,
                     'id': len(categories),
-                    'name': obj.name()
+                    'name': obj.name
                 })
                 cat = len(categories)-1
             annotations.append({
                 'segmentation': [],
-                'area': (obj.maxX()-obj.minX())*(obj.maxY()-obj.minY()),
+                'area': (obj.maxX-obj.minX)*(obj.maxY-obj.minY),
                 'iscrowd': 0,
                 'image_id': 1,
                 'bbox': [
-                    obj.minX(),
-                    obj.minY(),
-                    obj.maxX(),
-                    obj.maxY()
+                    obj.minX,
+                    obj.minY,
+                    obj.maxX,
+                    obj.maxY
                 ],
                 'category_id': cat,
                 'id': idx

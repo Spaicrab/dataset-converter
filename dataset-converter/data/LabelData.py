@@ -2,38 +2,26 @@ from .BoundingBox import BoundingBox
 
 class LabelData:
     def __init__(self, path, imageWidth, imageHeight):
-        self.__path = path
-        self.__imageWidth = int(imageWidth)
-        self.__imageHeight = int(imageHeight)
-        self.__objects = []
+        self.path = path
+        self.width = int(imageWidth)
+        self.height = int(imageHeight)
+        self.objects = []
 
     def filter_classes(self, classes):
         contains_accepted_class = False
-        for obj in self.objects():
+        for obj in self.objects:
             if obj.name() in classes:
                 contains_accepted_class = True
                 break
         return contains_accepted_class
 
     def addObject(self, name, minX, minY, maxX, maxY):
-        self.__objects.append(BoundingBox(name, minX, minY, maxX, maxY))
-
-    def width(self):
-        return self.__imageWidth
-
-    def height(self):
-        return self.__imageHeight
-
-    def objects(self):
-        return self.__objects
-
-    def path(self):
-        return self.__path
+        self.objects.append(BoundingBox(name, minX, minY, maxX, maxY))
 
     def show(self):
-        print(f"Image Path: {self.__path}")
-        print(f"Width: {self.__imageWidth}")
-        print(f"Height: {self.__imageHeight}")
+        print(f"Image Path: {self.path}")
+        print(f"Width: {self.imageWidth}")
+        print(f"Height: {self.imageHeight}")
         print(f"Objects: ")
-        for obj in self.__objects:
+        for obj in self.objects:
             obj.print()
