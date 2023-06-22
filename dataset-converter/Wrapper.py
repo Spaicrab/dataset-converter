@@ -272,3 +272,31 @@ class CocoWrapper(Wrapper):
         }
         f = open(changeExt(path, "json"), 'w')
         f.write(json.dumps(data_to_write, sort_keys=True, indent=4))
+
+
+class openimagesWrapper(Wrapper):
+    def ext(self):
+        return "csv"
+    
+    def read(self, label_path):
+        with open(self.filename1, "r") as f:
+            lines = f.readlines()[1:]
+            for line in lines:
+                line = line.strip().split(",")
+                current_id = line[0]
+                width, height = imagesize.get(line[0] + ".png")
+                
+                w = float(line[5]) - float(line[4])
+                h = float(line[7]) - float(line[6])
+                xc = float(line[5]) -  w / 2
+                yc = float(line[7]) - h / 2
+
+                try:
+                    _class = self.classes[line[2]]
+                except:
+                    print("skipped label, class not included")
+                    continue
+                label = f"{_class} {xc} {yc} {w} {h}\n"
+        
+
+    def write(self, path, data):
