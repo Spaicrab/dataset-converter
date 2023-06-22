@@ -1,30 +1,41 @@
-# Required arguments
+# Description
+Converts a dataset's labels from a format to another.
+Currently, the available format wrappers are:
+- Yolo
+- VOC
+- Coco (Only one label per image)
 
-```--sdir <path>``` The directory where the program reads txt files
-
-```--ddir <path>``` The directory where the program saves modified files
-
-```--iw <wrapper>``` Input Wrapper
-
-```--ow <wrapper>``` Output Wrapper
-
-# Available Wrappers
-
-- voc
-- fpds
-- labelme
-- yolo
-- coco (**only one image per .json file**)
-
-# API Usage
+# Syntax
 ```
-from api.DatasetConverterAPI import DatasetConverterAPI
+dataset-converter <INPUT_PATH> <OUTPUT_PATH> <INPUT_WRAPPER> <OUTPUT_WRAPPER> [--filter-classes (-f) <CLASS> [<CLASS> ...]] [--no-img (-n)]
+```
 
-api = DatasetConverterAPI()
-api.convert(SOURCE_DIR, DESTINATION_DIR, INPUT_WRAPPER, OUTPUT_WRAPPER)
+# Arguments
+``` <INPUT_PATH> ``` Input directory with the images and their labels.
+
+``` <OUTPUT_PATH> ``` Output directory that will contain all converted labels and their images (if there isn't --no-img).
+
+``` <INPUT_WRAPPER> ``` Input Wrapper.
+
+``` <OUTPUT_WRAPPER> ``` Output Wrapper.
+
+``` [--filter-classes (-f) <CLASS> [<CLASS> ...]] ``` List of classes to be filtered. All images that don't contain at least one of these classes will be ignored. - filtering is disabled by default
+
+``` [--no-img (-n)] ``` Don't copy images to <OUTPUT_PATH>.
+
+# Usage
+```
+converter = DatasetConverter()
+converter.convert(
+    in_dir, out_dir, in_wrap, out_wrap, [classes], [copy], [recursive]
+)
 ```
 where:
 
-**SOURCE_DIR** and **DESTINATION_DIR** are both dir paths
+**in_dir** and **out_dir** are both directory paths
 
-**INPUT_WRAPPER** and **OUTPUT_WRAPPER** are both strings
+**in_wrap** and **out_wrap** are both strings
+
+**classes** is a list
+
+**copy** and **recursive** are booleans
