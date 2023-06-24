@@ -275,6 +275,8 @@ class CocoWrapper(Wrapper):
 
 
 class openimagesWrapper(Wrapper):
+    """TO-DO"""
+
     def ext(self):
         return "csv"
     
@@ -298,5 +300,5 @@ class openimagesWrapper(Wrapper):
                     continue
                 label = f"{_class} {xc} {yc} {w} {h}\n"
         
-
     def write(self, path, data):
+        pass
